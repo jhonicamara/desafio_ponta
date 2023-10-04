@@ -1,4 +1,5 @@
 import 'package:crud_ponta/app/app_widget.dart';
+import 'package:crud_ponta/app/core/database/sqlite_connection_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,7 +25,13 @@ class AppModule extends StatelessWidget {
   Widget build(BuildContext context) {
     // Com o MultiProvider,
     return MultiProvider(
-      providers: [Provider(create: (_) => Object())],
+      providers: [
+        Provider(
+          create: (_) =>
+              SqliteConnectionFactory(), // Aqui disponibilizo na aplicação uma conexão para o banco de dados
+          lazy: false,
+        )
+      ],
       child: AppWidget(),
     );
   }

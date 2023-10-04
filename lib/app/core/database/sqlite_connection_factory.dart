@@ -1,6 +1,7 @@
+import 'package:crud_ponta/app/core/database/sqlite_migration_factory.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:path/path.dart'
+import 'package:path/path.dart';
 
 class SqliteConnectionFactory {
   static const _VERSION = 1;
@@ -27,10 +28,11 @@ class SqliteConnectionFactory {
     var databasePath = await getDatabasesPath();
     var databasePathFinal = join(databasePath, _DATABASE_NAME);
     if (_db == null) {
-      await _lock.synchronized(() async { // Com o synchronized eu informo que desejo que o APP aguarde esse processo acontecer
+      await _lock.synchronized(() async {
+        // Com o synchronized eu informo que desejo que o APP aguarde esse processo acontecer
         // Se o _db for nulo, abrir o database
         _db ??= await openDatabase(
-          databasePathFinal, 
+          databasePathFinal,
           version: _VERSION,
           onConfigure: _onConfigure,
           onCreate: _onCreate,
@@ -51,8 +53,29 @@ class SqliteConnectionFactory {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
-  Future<void> _onCreate(Database db, int version) async {}
-  Future<void> _onUpgrade(Database db, int oldVersion, int version) async {}
-  Future<void> _onDowngrade(Database db, int oldVersion, int version) async {}
+  Future<void> _onCreate(Database db, int version) async {
+    final batch = db.batch();
 
+    final migrations = SqliteMigrationFactory().getCreateMigration();
+
+    for (var migration in migrations) {
+      migration.create(batch);
+    }
+
+    batch.commit();
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int version) async {
+    final batch = db.batch();
+
+    final migrations = SqliteMigrationFactory().getUpgradedMigration(version);
+
+    for (var migration in migrations) {
+      migration.update(batch);
+    }
+
+    batch.commit();
+  }
+
+  Future<void> _onDowngrade(Database db, int oldVersion, int version) async {}
 }
