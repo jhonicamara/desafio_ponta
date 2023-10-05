@@ -11,7 +11,7 @@ class DefaultChangeNotifier extends ChangeNotifier {
   bool get isSucess => _sucess;
 
   void showLoading() => _loading = true;
-  void hideLoading() => _loading = true;
+  void hideLoading() => _loading = false;
   void sucess() => _sucess = true;
   void setError(String? error) => _error = error;
   void showLoadingAndResetState() {

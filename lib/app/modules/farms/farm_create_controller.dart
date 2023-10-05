@@ -8,11 +8,12 @@ class FarmCreateController extends DefaultChangeNotifier {
   FarmCreateController({required FarmsService farmsService})
       : _farmsService = farmsService;
 
-  void save(String name) async {
+  Future<void> save(String name) async {
     try {
       showLoadingAndResetState();
       notifyListeners();
       await _farmsService.save(name);
+      sucess();
     } catch (e, s) {
       print(e);
       print(s);

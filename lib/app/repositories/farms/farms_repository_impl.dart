@@ -12,7 +12,7 @@ class FarmsRepositoryImpl implements FarmsRepository {
   Future<void> save(String name) async {
     final conn = await _sqliteConnectionFactory.openConnection();
     await conn.insert('farms', {
-      'id': null,
+      'farm_id': null,
       'name': name,
     });
   }
