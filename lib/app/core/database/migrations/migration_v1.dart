@@ -5,16 +5,15 @@ class MigrationV1 implements Migration {
   @override
   void create(Batch batch) {
     batch.execute('''
-      create table fazendas(
-        fazenda_id Integer primary key autoincrement,
-        nome varchar(500) not null,
-      )
-
-      create table animais(
+      create table farms(
+        farm_id Integer primary key autoincrement,
+        name varchar(500) not null
+      );
+      create table animals(
         animal_id Integer primary key autoincrement,
-        tag_identificacao varchar(15) not null,
-        FOREIGN KEY(animal_fazenda_id) REFERENCES fazendas(fazenda_id)
-      )
+        tag varchar(15) not null,
+        FOREIGN KEY(animal_farm_id) REFERENCES farms(farm_id)
+      );
     ''');
   }
 

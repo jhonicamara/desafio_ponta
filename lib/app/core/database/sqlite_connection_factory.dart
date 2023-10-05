@@ -27,6 +27,7 @@ class SqliteConnectionFactory {
   Future<Database> openConnection() async {
     var databasePath = await getDatabasesPath();
     var databasePathFinal = join(databasePath, _DATABASE_NAME);
+    print(databasePathFinal);
     if (_db == null) {
       await _lock.synchronized(() async {
         // Com o synchronized eu informo que desejo que o APP aguarde esse processo acontecer
