@@ -1,27 +1,64 @@
+import 'package:crud_ponta/app/core/notifier/default_listener_notifier.dart';
 import 'package:crud_ponta/app/modules/farms/farms_module.dart';
-import 'package:crud_ponta/app/modules/home/widgets/home_drawer.dart';
+import 'package:crud_ponta/app/modules/home/home_controller.dart';
 import 'package:crud_ponta/app/modules/home/widgets/home_farms.dart';
 import 'package:crud_ponta/app/modules/home/widgets/home_header.dart';
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+import 'package:flutter/material.dart';
 
-  void _goToCreateFarm(BuildContext context) {
-    Navigator.of(context).push(PageRouteBuilder(
-      transitionDuration: Duration(milliseconds: 400),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        animation =
-            CurvedAnimation(parent: animation, curve: Curves.easeInQuad);
-        return ScaleTransition(
-          scale: animation,
-          alignment: Alignment.bottomRight,
-          child: child,
-        );
+class HomePage extends StatefulWidget {
+  final HomeController _homeController;
+
+  HomePage({Key? key, required HomeController homeController})
+      : _homeController = homeController,
+        super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    DefaultListenerNotifier(changeNotifier: widget._homeController).listener(
+      context: context,
+      sucessCallback: (notifier, listenerInstance) {
+        listenerInstance.dispose();
       },
-      pageBuilder: (context, animation, secondaryAnimation) =>
-          FarmsModule().getPage('/farm/create', context),
-    ));
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      // O que está dentro dessa função, só será executado após a construção da página.
+      widget._homeController.loadAllFarms();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _goToCreateFarm(BuildContext context) async {
+    await Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: Duration(milliseconds: 400),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          animation =
+              CurvedAnimation(parent: animation, curve: Curves.easeInQuad);
+          return ScaleTransition(
+            scale: animation,
+            alignment: Alignment.bottomRight,
+            child: child,
+          );
+        },
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            FarmsModule().getPage('/farm/create', context),
+      ),
+    );
+
+    widget._homeController.refreshPage();
   }
 
   @override
@@ -29,8 +66,8 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Ponta'),
+        automaticallyImplyLeading: false,
       ),
-      drawer: HomeDrawer(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
